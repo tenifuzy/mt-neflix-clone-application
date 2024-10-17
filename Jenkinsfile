@@ -6,6 +6,7 @@ pipeline{
     }
     environment {
         SCANNER_HOME=tool 'sonar-scanner'
+        DOCKER_IMAGE = "johntoby/netflix:${BUILD_NUMBER}"
     }
     stages {
         stage('clean workspace'){
