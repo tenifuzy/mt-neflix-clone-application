@@ -58,16 +58,15 @@ pipeline{
             environment {
                AWS_ACCESS_KEY_ID     = credentials('AWS_ACCESS_KEY_ID')
                AWS_SECRET_ACCESS_KEY = credentials('AWS_SECRET_ACCESS_KEY')
-    }
+            }
            steps {
                 script {
                    sh 'aws eks get-token --cluster-name EKS_CLOUD | kubectl apply -f -'
                    sh 'aws eks update-kubeconfig --name EKS_CLOUD --region us-east-2'
                    sh 'kubectl apply -f Kubernetes/deployment.yml'
+                }
+            }
         }
-    }
-}
-}  
         stage("TRIVY"){
             steps{
                 sh "trivy image johntoby/netflix:${BUILD_NUMBER} > trivyimage.txt"
@@ -87,5 +86,6 @@ pipeline{
         }
     }
 }
+
 
 
