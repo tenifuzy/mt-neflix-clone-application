@@ -58,7 +58,7 @@ pipeline{
             steps{
                 script{
                     withKubeConfig(caCertificate: '', clusterName: '', contextName: '', credentialsId: 'k8s', namespace: '', restrictKubeConfigAccess: false, serverUrl: '') {
-                    sh 'kubectl apply -f Kubernetes/deployment.yaml'
+                    sh 'kubectl apply -f Kubernetes/deployment.yml'
                   }
                 }
             }
