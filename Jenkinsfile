@@ -54,19 +54,19 @@ pipeline{
                 sh 'docker run -d --name netflix -p 8081:80 johntoby/netflix:${BUILD_NUMBER}'
             }
         } 
-       stage('Deploy to kubernetes'){
-            steps{
-               script{
-                    withAWS(credentials: 'aws-credentials-id', region: 'us-east-2') {  // Use your AWS credentials ID and region
-                    withKubeConfig(caCertificate: '', clusterName: '', contextName: '', credentialsId: 'k8s', namespace: '', restrictKubeConfigAccess: false, serverUrl: '') {
-                    sh '''
-                    sed -i 's|image: johntoby/netflix.*|image: johntoby/netflix:${BUILD_NUMBER}|' Kubernetes/deployment.yml
-                    kubectl apply -f Kubernetes/deployment.yml
-                    '''
-                }
-            }
+        stage('Deploy to Kubernetes') {
+            environment {
+               AWS_ACCESS_KEY_ID     = credentials('AWS_ACCESS_KEY_ID')
+               AWS_SECRET_ACCESS_KEY = credentials('AWS_SECRET_ACCESS_KEY')
+    }
+           steps {
+                script {
+                   sh 'aws eks get-token --cluster-name EKS_CLOUD | kubectl apply -f -'
+                   sh 'aws eks update-kubeconfig --name EKS_CLOUD --region us-east-2'
+                   sh 'kubectl apply -f Kubernetes/deployment.yml'
         }
     }
+}
 }  
         stage("TRIVY"){
             steps{
