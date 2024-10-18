@@ -63,7 +63,7 @@ pipeline{
                 script {
                    sh 'aws eks get-token --cluster-name EKS_CLOUD | kubectl apply -f -'
                    sh 'aws eks update-kubeconfig --name EKS_CLOUD --region us-east-2'
-                   sh 'kubectl apply -f Kubernetes/deployment.yml'
+                   sh 'kubectl apply -f Kubernetes/deployment.yml' --validate=false 
                 }
             }
         }
