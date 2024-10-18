@@ -1,12 +1,11 @@
 pipeline{
     agent any
     tools{
-        jdk 'jdk17'
+        jdk 'jdk-17'
         nodejs 'node16'
     }
     environment {
         SCANNER_HOME=tool 'sonar-scanner'
-        DOCKER_IMAGE = "johntoby/netflix:${BUILD_NUMBER}"
     }
     stages {
         stage('clean workspace'){
@@ -43,20 +42,21 @@ pipeline{
             steps{
                 script{
                    withDockerRegistry(credentialsId: 'docker', toolName: 'docker'){
-                       sh "docker build --build-arg TMDB_V3_API_KEY=db9ee4907cb9f2eb985252f811b81d05 -t johntoby/netflix${BUILD_NUMBER}:latest ."
-                       sh "docker push johntoby/netflix${BUILD_NUMBER}:latest "
+                       sh "docker build --build-arg TMDB_V3_API_KEY=db9ee4907cb9f2eb985252f811b81d05 -t johntoby/netflix:${BUILD_NUMBER} ."
+                       sh "docker push johntoby/netflix:${BUILD_NUMBER} "
                     }
                 }
             }
         }
         stage('Deploy to container'){
             steps{
-                sh 'docker run -d --name netflix -p 8081:80 johntoby/netflix${BUILD_NUMBER}:latest'
+                sh 'docker rm -f netflix || true' // Ensures the old container is removed if exists
+                sh 'docker run -d --name netflix -p 8081:80 johntoby/netflix:${BUILD_NUMBER}'
             }
         } 
         stage("TRIVY"){
             steps{
-                sh "trivy image johntoby/netflix${BUILD_NUMBER}:latest > trivyimage.txt"
+                sh "trivy image johntoby/netflix:${BUILD_NUMBER} > trivyimage.txt"
             }
         }
     }
