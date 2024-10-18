@@ -54,15 +54,20 @@ pipeline{
                 sh 'docker run -d --name netflix -p 8081:80 johntoby/netflix:${BUILD_NUMBER}'
             }
         } 
-        stage('Deploy to kubernetes'){
+       stage('Deploy to kubernetes'){
             steps{
-                script{
+               script{
+                    withAWS(credentials: 'aws-credentials-id', region: 'us-east-2') {  // Use your AWS credentials ID and region
                     withKubeConfig(caCertificate: '', clusterName: '', contextName: '', credentialsId: 'k8s', namespace: '', restrictKubeConfigAccess: false, serverUrl: '') {
-                    sh 'kubectl apply -f Kubernetes/deployment.yml'
-                  }
+                    sh '''
+                    sed -i 's|image: johntoby/netflix.*|image: johntoby/netflix:${BUILD_NUMBER}|' Kubernetes/deployment.yml
+                    kubectl apply -f Kubernetes/deployment.yml
+                    '''
                 }
             }
-        }    
+        }
+    }
+}  
         stage("TRIVY"){
             steps{
                 sh "trivy image johntoby/netflix:${BUILD_NUMBER} > trivyimage.txt"
