@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: netflix-app
-        image: johntoby/netflix:2
+        image: ola/netflix:2
         ports:
         - containerPort: 80
 ---
