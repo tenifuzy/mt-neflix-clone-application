@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: netflix-app
-        image: ola/netflix:2
+        image: tenifuzy01/netflix:2
         ports:
         - containerPort: 80
 ---
